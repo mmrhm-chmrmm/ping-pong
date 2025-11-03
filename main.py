@@ -1,6 +1,8 @@
 import pygame
 
 
+pygame.font.init()
+
 
 WINDOW_SIZE =(1200, 900)
 WIN_W, WIN_H = WINDOW_SIZE
@@ -71,6 +73,7 @@ background_image = pygame.image.load('background.jpg')
 background_image = pygame.transform.scale(background_image, WINDOW_SIZE)
 clock = pygame.time.Clock()
 
+result_font = pygame.font.SysFont('Arial', 75)
 
 player_1 = Player(80, 350, 20, 200, 5, 'rocket.png', None)
 player_2 = Player(WIN_W - 100, 350, 20, 200, 5, 'rocket.png', None)
@@ -97,10 +100,20 @@ while is_running:
         ball.update()
         if pygame.sprite.spritecollideany(ball, [player_1, player_2]):
             ball.speed_x = -ball.speed_x
+        if ball.rect.x <= 0:
+            is_finished = True
+            result_label = result_font.render('ИГРОК НОМЕР 2 ПОБЕДИЛ', True, WHITE)
+        if ball.rect.x >= WIN_W - ball.rect.width:
+            is_finished = True
+            result_label = result_font.render('ИГРОК НОМЕР 1 ПОБЕДИЛ', True, WHITE)
+    
+
     main_window.blit(background_image, (0, 0))
     player_1.reset(main_window)
     player_2.reset(main_window)
     ball.reset(main_window)
+    if is_finished:
+        main_window.blit(result_label, (200, 150))
     pygame.display.update()
     clock.tick(FPS)
 
