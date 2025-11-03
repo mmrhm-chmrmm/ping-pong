@@ -25,7 +25,7 @@ class GameSprite(pygame.sprite.Sprite):
 
 
 class Player(GameSprite):
-    def __init__(self, x, y, width, height, step_size, image_filename, fire_sound_file):
+    def __init__(self, x, y, width, height, step_size, image_filename, firesound_filename):
         super().__init__(x, y, width, height, step_size, image_filename)
         self.keys = {
             'UP': None,
@@ -48,8 +48,16 @@ class Player(GameSprite):
 
     
 class Ball(GameSprite): 
-    pass
+    def __init__(self, x, y, width, height, step_size, image_filename):
+        super().__init__(x, y, width, height, step_size, image_filename)
+        self.speed_x = step_size
+        self.speed_y = step_size
 
+    def update(self):
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
+        if self.rect.y >= WIN_H - self.rect.height or self.rect.y <= 0:
+            self.speed_y = -self.speed_y
 
 
 
@@ -68,7 +76,7 @@ player_1 = Player(80, 350, 20, 200, 5, 'rocket.png', None)
 player_2 = Player(WIN_W - 100, 350, 20, 200, 5, 'rocket.png', None)
 player_1.set_control_keys(pygame.K_UP, pygame.K_DOWN)
 player_2.set_control_keys(pygame.K_w, pygame.K_s)   
-
+ball = Ball(600, 450, 25, 25, 3, 'ball.png')
 
 
 
@@ -86,11 +94,14 @@ while is_running:
     if not is_finished:
         player_1.update()
         player_2.update()
+        ball.update()
+        if pygame.sprite.spritecollideany(ball, [player_1, player_2]):
+            ball.speed_x = -ball.speed_x
     main_window.blit(background_image, (0, 0))
     player_1.reset(main_window)
     player_2.reset(main_window)
+    ball.reset(main_window)
     pygame.display.update()
     clock.tick(FPS)
-
 
 
